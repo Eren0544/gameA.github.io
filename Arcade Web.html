@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arcade Web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7fb;--side:#fff;--card:#fff;--tx:#161823;--mut:#737891;--ac:#5b5bd6;--bd:#e4e6ef;box-sizing:border-box}
+:root[data-theme="dark"]{--bg:#0f1117;--side:#151821;--card:#1a1d28;--tx:#eceef7;--mut:#8b90a8;--ac:#8b8bff;--bd:#272b3a;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Poppins,system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;min-height:100vh;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+button{font:inherit;color:inherit;cursor:pointer}
+aside{width:200px;flex:none;background:var(--side);border-right:1px solid var(--bd);padding:20px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.logo{font-weight:800;font-size:1.1rem;padding:0 10px 16px}
+.nav{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:9px;border:0;background:none;color:var(--mut)}
+.nav:hover{background:var(--bg)}
+.nav.on{background:var(--bg);color:var(--tx);font-weight:600}
+.sp{flex:1}
+main{flex:1;min-width:0;padding:22px 28px 50px;max-width:1200px}
+.sb{width:100%;max-width:420px;padding:11px 14px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:.95rem;outline:none;margin-bottom:20px}
+.sb:focus{border-color:var(--ac)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;transition:.15s;position:relative}
+.card:hover{border-color:var(--ac);transform:translateY(-3px)}
+.art{height:125px;display:grid;place-items:center;font-size:2.2rem;font-weight:800;color:#fff;background-size:cover;background-position:center;position:relative}
+.ib{position:absolute;top:7px;width:30px;height:30px;border-radius:50%;border:0;background:#0006;color:#fff;font-size:.9rem;opacity:0;transition:.15s}
+.card:hover .ib,.ib.f{opacity:1}
+.ib.f{right:7px}.ib.p{left:7px}
+.info{padding:11px 13px 13px}
+.nm{font-weight:600}
+.ht{font-size:.75rem;color:var(--mut);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.warn{color:#d98a00}
+.empty{color:var(--mut);padding:50px 0}
+#player{position:fixed;inset:0;z-index:30;background:#000;display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+#player.on{display:flex}
+#pb{display:flex;gap:8px;align-items:center;padding:10px 14px;background:var(--side);border-bottom:1px solid var(--bd)}
+#pb b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{border:1px solid var(--bd);background:var(--card);padding:8px 14px;border-radius:9px}
+#fr{flex:1;border:0;width:100%}
+#dlg{position:fixed;inset:0;background:#0008;z-index:40;display:none;place-items:center}
+#dlg.on{display:grid}
+#dlg div{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;width:min(420px,92vw);display:flex;flex-direction:column;gap:10px}
+#dlg input{padding:10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+.card:hover{box-shadow:0 10px 28px color-mix(in srgb,var(--ac) 28%,transparent)}
+#ld{position:fixed;inset:0;z-index:50;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(6px);display:none;flex-direction:column;gap:18px;align-items:center;justify-content:center;font-weight:600}
+#ld.on{display:flex}
+/* Switch jour/nuit : Uiverse.io by JaydipPrajapati1910 (MIT) */
+.btn-color-mode-switch{display:inline-block;margin:0 auto 4px;position:relative;flex:none}
+.btn-color-mode-switch>label.btn-color-mode-switch-inner{margin:0;width:140px;height:30px;background:#E0E0E0;color:#424242;border-radius:26px;overflow:hidden;position:relative;transition:all .3s ease;display:block;cursor:pointer;font-size:12px;font-weight:500;box-shadow:inset 0 0 0 1px var(--bd)}
+.btn-color-mode-switch>label.btn-color-mode-switch-inner:before{content:attr(data-on);position:absolute;line-height:16px;top:7px;right:20px}
+.btn-color-mode-switch>label.btn-color-mode-switch-inner:after{content:attr(data-off);width:70px;height:16px;background:#fff;border-radius:26px;position:absolute;left:2px;top:2px;text-align:center;transition:all .3s ease;box-shadow:0 0 6px -2px #111;padding:5px 0;line-height:16px}
+.btn-color-mode-switch input[type="checkbox"]{cursor:pointer;width:100%;height:100%;opacity:0;position:absolute;top:0;left:0;z-index:1;margin:0}
+.btn-color-mode-switch input[type="checkbox"]:checked+label.btn-color-mode-switch-inner{background:#151515;color:#fff}
+.btn-color-mode-switch input[type="checkbox"]:checked+label.btn-color-mode-switch-inner:after{content:attr(data-on);left:68px;background:#3c3c3c}
+.btn-color-mode-switch input[type="checkbox"]:checked+label.btn-color-mode-switch-inner:before{content:attr(data-off);right:auto;left:20px}
+.btn-color-mode-switch input[type="checkbox"]:focus-visible+label.btn-color-mode-switch-inner{outline:2px solid var(--ac);outline-offset:2px}
+input{font-family:inherit}
+.mrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+.mrow .sb{margin-bottom:0}
+.setwrap{position:relative;flex:none}
+/* Bouton menu : Uiverse.io by vinodjangid07 (MIT) */
+#checkbox{display:none}
+.toggle{position:relative;width:40px;height:40px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition-duration:.3s}
+.bars{width:100%;height:4px;background-color:var(--tx);border-radius:5px;transition-duration:.3s}
+#checkbox:checked+.toggle #bar2{transform:translateY(14px) rotate(60deg);margin-left:0;transform-origin:right;transition-duration:.3s;z-index:2}
+#checkbox:checked+.toggle #bar1{transform:translateY(28px) rotate(-60deg);transition-duration:.3s;transform-origin:left;z-index:1}
+#checkbox:checked+.toggle{transform:rotate(-90deg)}
+#panel{position:absolute;right:0;top:calc(100% + 8px);width:min(290px,calc(100vw - 32px));background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px;box-shadow:0 14px 34px #0003;z-index:20;visibility:hidden;opacity:0;transform:translateY(-6px);transition:.2s}
+#checkbox:checked~#panel{visibility:visible;opacity:1;transform:none}
+#panel h4{margin:0;font-size:1rem}
+.prow{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:.9rem}
+.prow .btn-color-mode-switch{margin:0}
+#optld{width:18px;height:18px;accent-color:var(--ac);cursor:pointer}
+#panel .pill{width:100%;text-align:center;font-size:.85rem}
+#ld span{font-size:1rem;font-weight:500;letter-spacing:.02em;text-align:center;padding:0 20px}
+/* Loader : Uiverse.io by abrahamcalsin (MIT) */
+.dot-spinner{--uib-size:3.6rem;--uib-speed:.9s;--uib-color:var(--ac);position:relative;display:flex;align-items:center;justify-content:flex-start;height:var(--uib-size);width:var(--uib-size)}
+.dot-spinner__dot{position:absolute;top:0;left:0;display:flex;align-items:center;justify-content:flex-start;height:100%;width:100%}
+.dot-spinner__dot::before{content:'';height:20%;width:20%;border-radius:50%;background-color:var(--uib-color);transform:scale(0);opacity:.5;animation:pulse0112 calc(var(--uib-speed)*1.111) ease-in-out infinite;box-shadow:0 0 20px color-mix(in srgb,var(--uib-color) 35%,transparent)}
+.dot-spinner__dot:nth-child(2){transform:rotate(45deg)}
+.dot-spinner__dot:nth-child(2)::before{animation-delay:calc(var(--uib-speed)*-.875)}
+.dot-spinner__dot:nth-child(3){transform:rotate(90deg)}
+.dot-spinner__dot:nth-child(3)::before{animation-delay:calc(var(--uib-speed)*-.75)}
+.dot-spinner__dot:nth-child(4){transform:rotate(135deg)}
+.dot-spinner__dot:nth-child(4)::before{animation-delay:calc(var(--uib-speed)*-.625)}
+.dot-spinner__dot:nth-child(5){transform:rotate(180deg)}
+.dot-spinner__dot:nth-child(5)::before{animation-delay:calc(var(--uib-speed)*-.5)}
+.dot-spinner__dot:nth-child(6){transform:rotate(225deg)}
+.dot-spinner__dot:nth-child(6)::before{animation-delay:calc(var(--uib-speed)*-.375)}
+.dot-spinner__dot:nth-child(7){transform:rotate(270deg)}
+.dot-spinner__dot:nth-child(7)::before{animation-delay:calc(var(--uib-speed)*-.25)}
+.dot-spinner__dot:nth-child(8){transform:rotate(315deg)}
+.dot-spinner__dot:nth-child(8)::before{animation-delay:calc(var(--uib-speed)*-.125)}
+@keyframes pulse0112{0%,100%{transform:scale(0);opacity:.5}50%{transform:scale(1);opacity:1}}
+@media (max-width:760px){body{flex-direction:column}aside{width:100%;height:auto;position:static;flex-direction:row;overflow-x:auto;padding:10px;border-right:0;border-bottom:1px solid var(--bd)}.logo,.sp{display:none}.nav{width:auto;white-space:nowrap}main{padding:16px}}
+</style>
+</head>
+<body>
+<aside id="side"></aside>
+<main><div class="mrow"><input class="sb" id="q" placeholder="Rechercher un jeu…" autocomplete="off"><div class="setwrap" id="setwrap"><input type="checkbox" id="checkbox"><label for="checkbox" class="toggle" aria-label="Paramètres"><div class="bars" id="bar1"></div><div class="bars" id="bar2"></div><div class="bars" id="bar3"></div></label><div id="panel"><h4>Paramètres</h4><div class="prow"><span>Thème</span><span id="swslot"></span></div><div class="prow"><label for="optld">Écran de chargement</label><input type="checkbox" id="optld"></div><button class="pill" id="rst">Réinitialiser favoris et récents</button></div></div></div><div id="main"></div></main>
+
+<div id="ld"><div class="dot-spinner"><div class="dot-spinner__dot"></div><div class="dot-spinner__dot"></div><div class="dot-spinner__dot"></div><div class="dot-spinner__dot"></div><div class="dot-spinner__dot"></div><div class="dot-spinner__dot"></div><div class="dot-spinner__dot"></div><div class="dot-spinner__dot"></div></div><span id="lt">Lancement…</span></div>
+<div id="player"><div id="pb"><button class="pill" id="back">← Retour</button><b id="pt"></b><button class="pill" id="fs">Plein écran</button><button class="pill" id="ext">Nouvel onglet ↗</button></div><iframe id="fr" allow="fullscreen; gamepad; autoplay; pointer-lock; clipboard-write" allowfullscreen></iframe></div>
+<div id="dlg"><div><b id="dt"></b><span style="color:var(--mut);font-size:.85rem">Colle l'URL complète du jeu :</span><input id="di" placeholder="https://…"><span style="display:flex;gap:8px;justify-content:flex-end"><button class="pill" id="dc">Annuler</button><button class="pill" id="dk" style="background:var(--ac);color:#fff;border-color:var(--ac)">Enregistrer</button></span></div></div>
+<script>
+var G=[
+["BO1 Zombies","vel.gg/bo1z"],["Moon","moon-zombies.pages.dev"],["Kino der Toten","kino-der-toten.pages.dev"],["BO3 Cheese Cube","cheese-cube.pages.dev"],
+["Black Ops 2","vibeslops.luckeysystems.com"],["Modern Warfare 2","ovz-game-production.up.railway.app"],["Skate 3","skate.aaddpp.lol"],["Skate Rust","global-terror.net"],["CS Surf","surfd.net"],
+["Halo CE","mitchellhynes.com/halo"],["Halo CE mobile","hcemobile.com"],["PES 6","pes6.optijuegos.net"],
+["GTA 5","web.archive.org/web/20261005232456/https://playgta5.com/"],["GTA Vice City",""],
+["The Simpsons: Hit & Run","shar-wasm.cjoseph.workers.dev/?skipmovie"],
+["Quake 1","q1.pieter.com"],["Quake 2","q2.pieter.com"],["Quake 3","q3.pieter.com"],["Return to Castle Wolfenstein","rtcw.pieter.com"],["Unreal Tournament","ut.pieter.com"],
+["Half-Life","pixelsuft.github.io/hl/"],["Half-Life / CS 1.6","x8bitrain.github.io/webXash/"],["Diablo","johnimril.github.io/diablo_web/"],["Hedgewars","webwars.link"],["Plus de GTA / Minecraft",""]];
+
+/* ─── IMAGES DES JEUX (modifiables uniquement ici, dans le code source) ───
+   Ajoute une ligne : "Nom exact du jeu":"data:image/jpeg;base64,…",
+   Utilise des data: URI : les images https:// sont bloquées sur la page hébergée.
+   Sans image, la carte affiche un dégradé avec les initiales du jeu. */
+var IMGS={
+// "Quake 3":"data:image/jpeg;base64,…",
+};
+var ST;try{ST=JSON.parse(localStorage.getItem("arcade")||"{}")}catch(e){ST={}}
+ST.fav=ST.fav||[];ST.rec=ST.rec||[];ST.urls=ST.urls||{};ST.theme="light";
+function save(){try{localStorage.setItem("arcade",JSON.stringify(ST))}catch(e){alert("Stockage plein : image non enregistrée.")}}
+var $=function(i){return document.getElementById(i)};
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+document.documentElement.setAttribute("data-theme","light");
+var sw=el("div","btn-color-mode-switch");
+sw.innerHTML='<input type="checkbox" id="color_mode" aria-label="Basculer entre thème clair et sombre"><label for="color_mode" data-on="Nuit" data-off="Jour" class="btn-color-mode-switch-inner"></label>';
+var cm=sw.querySelector("input");cm.checked=ST.theme==="dark";
+cm.onchange=function(){document.documentElement.setAttribute("data-theme",cm.checked?"dark":"light")};
+$("swslot").appendChild(sw);
+var ol=$("optld");ol.checked=!ST.noLoader;ol.onchange=function(){ST.noLoader=!ol.checked;save()};
+function two(id,label,fn){var b=$(id),t;b.onclick=function(){if(b.dataset.arm){clearTimeout(t);delete b.dataset.arm;b.textContent="Fait ✓";fn();setTimeout(function(){b.textContent=label},1500)}else{b.dataset.arm=1;b.textContent="Confirmer ?";t=setTimeout(function(){delete b.dataset.arm;b.textContent=label},3000)}}}
+two("rst","Réinitialiser favoris et récents",function(){ST.fav=[];ST.rec=[];save();render()});
+
+var cb=$("checkbox");
+document.addEventListener("click",function(e){if(!$("setwrap").contains(e.target))cb.checked=false});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")cb.checked=false});
+var view="Tous",q="",cur="",pend=null,imgFor=null;
+function url(g){var u=g[1]||ST.urls[g[0]]||"";return u?(/^https?:/.test(u)?u:"https://"+u):""}
+function hue(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h}
+function ini(g){return g[0].replace(/[^A-Za-z0-9 ]/g,"").split(" ").map(function(w){return w[0]}).join("").slice(0,3).toUpperCase()}
+function ask(g,cb){pend=[g,cb];$("dt").textContent=g[0];$("di").value="";$("dlg").classList.add("on");$("di").focus()}
+$("dc").onclick=function(){$("dlg").classList.remove("on")};
+$("dk").onclick=function(){var v=$("di").value.trim();if(!v)return;ST.urls[pend[0][0]]=v;save();$("dlg").classList.remove("on");var c=pend[1];render();c()};
+function touch(g){ST.rec=[g[0]].concat(ST.rec.filter(function(n){return n!==g[0]})).slice(0,12);save()}
+function play(g){var u=url(g);if(!u){ask(g,function(){play(g)});return}touch(g);window.open(u,"_blank","noopener");$("lt").textContent="Lancement de "+g[0]+"…";if(!ST.noLoader){$("ld").classList.add("on");setTimeout(function(){$("ld").classList.remove("on")},1700)}}
+$("back").onclick=function(){$("player").classList.remove("on");$("fr").src="about:blank";render()};
+$("fs").onclick=function(){if($("fr").requestFullscreen)$("fr").requestFullscreen()};
+$("ext").onclick=function(){if(cur)window.open(cur,"_blank","noopener")};
+
+function card(g){
+var c=el("div","card"),a=el("div","art"),im=IMGS[g[0]];
+if(im){a.style.backgroundImage="url("+im+")"}else{a.textContent=ini(g);var h=hue(g[0]);a.style.background="linear-gradient(135deg,hsl("+h+",65%,55%),hsl("+(h+45)+",65%,40%))"}
+var f=el("button","ib f",ST.fav.indexOf(g[0])>-1?"★":"☆");f.title="Favori";
+f.onclick=function(e){e.stopPropagation();var i=ST.fav.indexOf(g[0]);if(i>-1)ST.fav.splice(i,1);else ST.fav.push(g[0]);save();render()};
+a.appendChild(f);c.appendChild(a);
+var b=el("div","info");b.appendChild(el("div","nm",g[0]));
+var u=url(g);b.appendChild(u?el("div","ht",u.replace(/^https?:\/\//,"")):el("div","ht warn","⚠ Lien à compléter"));
+c.appendChild(b);c.onclick=function(){play(g)};return c}
+function render(){
+var s=$("side");s.innerHTML="";s.appendChild(el("div","logo","🎮 Arcade Web"));
+["Tous","Favoris","Récents"].forEach(function(n){var b=el("button","nav"+(n===view?" on":""),n);b.onclick=function(){view=n;render()};s.appendChild(b)});
+s.appendChild(el("div","sp"));
+
+var m=$("main");m.innerHTML="";
+var l=G.filter(function(g){
+if(q&&g[0].toLowerCase().indexOf(q)<0)return false;
+if(view==="Favoris")return ST.fav.indexOf(g[0])>-1;
+if(view==="Récents")return ST.rec.indexOf(g[0])>-1;return true});
+if(view==="Récents")l.sort(function(a,b){return ST.rec.indexOf(a[0])-ST.rec.indexOf(b[0])});
+if(!l.length){m.appendChild(el("div","empty",view==="Favoris"?"Aucun favori : clique sur ☆ sur un jeu.":"Rien à afficher."));return}
+var gr=el("div","grid");l.forEach(function(g){gr.appendChild(card(g))});m.appendChild(gr)}
+$("q").oninput=function(e){q=e.target.value.trim().toLowerCase();render()};
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){if($("dlg").classList.contains("on"))$("dc").click();else if($("player").classList.contains("on"))$("back").click()}});
+render();
+</script>
+</body>
+</html>
